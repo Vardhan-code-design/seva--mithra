@@ -9,8 +9,6 @@
     </a>
 
     <div class="card">
-      <!-- These are real links, not JavaScript buttons.
-           They always work even if JavaScript is disabled. -->
       <div class="tabs">
         <a class="tab-link {% if selected_role == 'user' %}active{% endif %}"
            href="{{ url_for('login', role='user') }}">
@@ -67,12 +65,6 @@
         <a href="{{ url_for('register', role='provider') }}">Register as Service Provider</a>
       </div>
 
-      <div class="demo">
-        <b>Demo credentials</b><br>
-        User: user@demo.com / 123456<br>
-        Provider: provider@demo.com / 123456<br>
-        Admin: admin@sevamithra.com / admin123
-      </div>
     </div>
   </div>
 </div>
