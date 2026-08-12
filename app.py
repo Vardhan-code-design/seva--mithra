@@ -210,7 +210,9 @@ def close_db(exception=None):
 
 def init_db():
     db = sqlite3.connect(DB)
+    db.row_factory = sqlite3.Row
 
+    # Create tables if they do not exist
     db.executescript("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -261,13 +263,91 @@ def init_db():
     );
     """)
 
+    # ---------------------------------------------------------
+    # DATABASE MIGRATION
+    # Add missing columns to old databases
+    # ---------------------------------------------------------
+
+    def add_missing_columns(table, columns):
+        existing = {
+            row["name"]
+            for row in db.execute(f"PRAGMA table_info({table})").fetchall()
+        }
+
+        for column_name, column_definition in columns.items():
+            if column_name not in existing:
+                db.execute(
+                    f"ALTER TABLE {table} ADD COLUMN "
+                    f"{column_name} {column_definition}"
+                )
+
+    add_missing_columns(
+        "users",
+        {
+            "name": "TEXT",
+            "email": "TEXT",
+            "phone": "TEXT",
+            "password": "TEXT",
+            "address": "TEXT",
+            "created_at": "TEXT",
+        },
+    )
+
+    add_missing_columns(
+        "providers",
+        {
+            "name": "TEXT",
+            "email": "TEXT",
+            "phone": "TEXT",
+            "password": "TEXT",
+            "service": "TEXT",
+            "work_type": "TEXT",
+            "experience": "TEXT",
+            "qualification": "TEXT",
+            "location": "TEXT",
+            "pricing": "TEXT",
+            "contact": "TEXT",
+            "created_at": "TEXT",
+        },
+    )
+
+    add_missing_columns(
+        "bookings",
+        {
+            "user_id": "INTEGER",
+            "provider_id": "INTEGER",
+            "service": "TEXT",
+            "work_type": "TEXT",
+            "address": "TEXT",
+            "booking_date": "TEXT",
+            "status": "TEXT",
+            "created_at": "TEXT",
+        },
+    )
+
+    add_missing_columns(
+        "reviews",
+        {
+            "booking_id": "INTEGER",
+            "user_id": "INTEGER",
+            "provider_id": "INTEGER",
+            "rating": "INTEGER",
+            "review": "TEXT",
+            "created_at": "TEXT",
+        },
+    )
+
+    # ---------------------------------------------------------
+    # Demo user
+    # ---------------------------------------------------------
+
     cur = db.cursor()
 
-    # Demo user
     if not cur.execute(
         "SELECT 1 FROM users WHERE email=?",
         ("user@demo.com",)
     ).fetchone():
+
         cur.execute(
             """
             INSERT INTO users
@@ -284,11 +364,15 @@ def init_db():
             ),
         )
 
+    # ---------------------------------------------------------
     # Demo provider
+    # ---------------------------------------------------------
+
     if not cur.execute(
         "SELECT 1 FROM providers WHERE email=?",
         ("provider@demo.com",)
     ).fetchone():
+
         cur.execute(
             """
             INSERT INTO providers
@@ -312,11 +396,20 @@ def init_db():
             ),
         )
 
+    # ---------------------------------------------------------
     # Dummy providers
+    # ---------------------------------------------------------
+
     for service, provider_list in DUMMY_PROVIDERS.items():
+
         for (
-            name, phone, work_type, experience,
-            qualification, location, pricing
+            name,
+            phone,
+            work_type,
+            experience,
+            qualification,
+            location,
+            pricing,
         ) in provider_list:
 
             email = (
@@ -329,6 +422,7 @@ def init_db():
                 "SELECT 1 FROM providers WHERE email=?",
                 (email,),
             ).fetchone():
+
                 cur.execute(
                     """
                     INSERT INTO providers
@@ -354,10 +448,7 @@ def init_db():
 
     db.commit()
     db.close()
-
-
 init_db()
-
 
 # ============================================================
 # AUTH HELPERS
@@ -495,7 +586,19 @@ def register(role="user"):
             db.commit()
 
         except sqlite3.IntegrityError:
+            db.rollback()
             flash("An account with this email already exists.")
+            return render_template(
+                "register.html",
+                role=role,
+                services=SERVICES,
+                tutor_types=TUTOR_TYPES,
+            )
+
+        except sqlite3.Error as e:
+            db.rollback()
+            print("DATABASE ERROR:", e)
+            flash("Registration failed because of a database error.")
             return render_template(
                 "register.html",
                 role=role,
