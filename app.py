@@ -638,77 +638,105 @@ def login():
 
         db = get_db()
 
-        # ====================================================
-        # ADMIN LOGIN
-        # ONLY THESE THREE ACCOUNTS ARE ADMINS
-        # ====================================================
-        if role == "admin":
-            admin_credentials = {
-                "sriram@gmail.com": "12345",
-                "rahul@gmail.com": "5553",
-                "vardhan@gmail.com": "6300",
-            }
+        try:
+            # ====================================================
+            # ADMIN LOGIN
+            # ONLY THESE THREE ACCOUNTS ARE ADMINS
+            # ====================================================
+            if role == "admin":
+                admin_credentials = {
+                    "sriram@gmail.com": "12345",
+                    "rahul@gmail.com": "5553",
+                    "vardhan@gmail.com": "6300",
+                }
 
-            if admin_credentials.get(email) == password:
-                session.clear()
-                session.update(
-                    logged_in=True,
-                    role="admin",
-                    user_id=0,
-                    name="Administrator",
+                if admin_credentials.get(email) == password:
+                    session.clear()
+                    session.update(
+                        logged_in=True,
+                        role="admin",
+                        user_id=0,
+                        name="Administrator",
+                    )
+                    return redirect(url_for("admin_dashboard"))
+
+                flash("Invalid admin credentials.")
+                return render_template(
+                    "login.html",
+                    selected_role="admin",
                 )
-                return redirect(url_for("admin_dashboard"))
 
-            flash("Invalid admin credentials.")
-            return render_template(
-                "login.html",
-                selected_role="admin",
-            )
+            # ====================================================
+            # SERVICE PROVIDER LOGIN
+            # ====================================================
+            if role == "provider":
+                row = db.execute(
+                    "SELECT * FROM providers WHERE email=?",
+                    (email,),
+                ).fetchone()
 
-        # ====================================================
-        # SERVICE PROVIDER LOGIN
-        # ====================================================
-        if role == "provider":
+                if row:
+                    try:
+                        valid_password = check_password_hash(
+                            row["password"] or "",
+                            password,
+                        )
+                    except (ValueError, TypeError):
+                        valid_password = False
+
+                    if valid_password:
+                        session.clear()
+                        session.update(
+                            logged_in=True,
+                            role="provider",
+                            user_id=row["id"],
+                            name=row["name"],
+                        )
+                        return redirect(url_for("provider_dashboard"))
+
+                flash("Invalid provider email or password.")
+                return render_template(
+                    "login.html",
+                    selected_role="provider",
+                )
+
+            # ====================================================
+            # USER LOGIN
+            # ====================================================
             row = db.execute(
-                "SELECT * FROM providers WHERE email=?",
+                "SELECT * FROM users WHERE email=?",
                 (email,),
             ).fetchone()
 
-            if row and check_password_hash(row["password"], password):
-                session.clear()
-                session.update(
-                    logged_in=True,
-                    role="provider",
-                    user_id=row["id"],
-                    name=row["name"],
-                )
-                return redirect(url_for("provider_dashboard"))
+            if row:
+                try:
+                    valid_password = check_password_hash(
+                        row["password"] or "",
+                        password,
+                    )
+                except (ValueError, TypeError):
+                    valid_password = False
 
-            flash("Invalid provider email or password.")
-            return render_template(
-                "login.html",
-                selected_role="provider",
-            )
+                if valid_password:
+                    session.clear()
+                    session.update(
+                        logged_in=True,
+                        role="user",
+                        user_id=row["id"],
+                        name=row["name"],
+                    )
+                    return redirect(url_for("user_dashboard"))
 
-        # ====================================================
-        # USER LOGIN
-        # ====================================================
-        row = db.execute(
-            "SELECT * FROM users WHERE email=?",
-            (email,),
-        ).fetchone()
+            flash("Invalid user email or password.")
 
-        if row and check_password_hash(row["password"], password):
-            session.clear()
-            session.update(
-                logged_in=True,
-                role="user",
-                user_id=row["id"],
-                name=row["name"],
-            )
-            return redirect(url_for("user_dashboard"))
+        except sqlite3.Error as e:
+            db.rollback()
+            print("LOGIN DATABASE ERROR:", e)
+            flash("Login failed because of a database error.")
 
-        flash("Invalid user email or password.")
+        except Exception as e:
+            print("LOGIN ERROR:", e)
+            flash("Unable to login right now. Please try again.")
 
     return render_template(
         "login.html",
