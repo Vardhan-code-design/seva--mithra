@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Seva Mithra - Find, Book, Relax{% endblock %}
+
+{% block content %}
+<section class="landing">
+  <div class="welcome-logo-watermark" aria-hidden="true">
+    <img src="{{ url_for('static', filename='seva_mithra_logo.jpeg') }}" alt="">
+  </div>
+  <div class="floating-shape shape-one"></div>
+  <div class="floating-shape shape-two"></div>
+  <div class="floating-shape shape-three"></div>
+
+  <div class="landing-glow glow-one"></div>
+  <div class="landing-glow glow-two"></div>
+
+  <div class="landing-content">
+    <div class="hero-logo-wrap">
+      <img class="hero-logo" src="{{ url_for('static', filename='seva_mithra_logo.jpeg') }}" alt="Seva Mithra">
+    </div>
+
+    <span class="eyebrow hero-eyebrow">✦ FIND • BOOK • RELAX ✦</span>
+
+    <h1>
+      Trusted services.<br>
+      <span>Skilled professionals.</span>
+    </h1>
+
+    <p class="hero-description">
+      Find the right professional for your work, compare their experience,
+      qualifications and pricing, and book with confidence.
+    </p>
+
+    <form class="search main-search" method="get" action="{{ url_for('search_providers') }}">
+      <div class="search-field">
+        <span>🔎</span>
+        <input name="service" list="serviceOptions" placeholder="What service do you need?" required>
+        <datalist id="serviceOptions">
+          {% for i,n,d in services %}
+          <option value="{{ n }}">{{ d }}</option>
+          {% endfor %}
+        </datalist>
+      </div>
+
+      <div class="search-divider"></div>
+
+      <div class="search-field location-field">
+        <span>📍</span>
+        <select name="location">
+          <option>Hyderabad</option>
+          <option>Vijayawada</option>
+          <option>Visakhapatnam</option>
+          <option>Rajahmundry</option>
+        </select>
+      </div>
+
+      <button class="btn primary search-btn" type="submit">
+        Search Providers
+      </button>
+    </form>
+
+    <div class="hero-actions">
+      <a href="{{ url_for('register', role='user') }}" class="btn primary big-btn">Book a Service</a>
+      <a href="{{ url_for('register', role='provider') }}" class="btn glass-btn big-btn">Become a Provider</a>
+    </div>
+
+    <div class="mini-features">
+      <span>✓ Compare professionals</span>
+      <span>✓ Transparent pricing</span>
+      <span>✓ Multiple service categories</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint">SCROLL TO EXPLORE <span>↓</span></div>
+</section>
+
+<section class="section service-section" id="services">
+  <div class="head center">
+    <div>
+      <span class="eyebrow">EXPLORE SERVICES</span>
+      <h2>Everything you need, in one place</h2>
+      <p class="section-subtitle">Select a category and compare available professionals.</p>
+    </div>
+  </div>
+
+  <div class="categories">
+    {% for icon,name,desc in services %}
+    <a class="category service-card {% if name=='Tutor' %}featured{% endif %}"
+       href="{{ url_for('search_providers', service=name) }}">
+      <span>{{ icon }}</span>
+      <b>{{ name }}</b>
+      <small>{{ desc }}</small>
+      <em>View providers →</em>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

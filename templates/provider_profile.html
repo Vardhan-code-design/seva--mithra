@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block title %}Provider Profile - Seva Mithra{% endblock %}{% block content %}
+<div class="auth"><div class="auth-box wide"><div class="card"><span class="eyebrow">SERVICE PROVIDER</span><h1>Edit Provider Profile</h1><form class="form two" method="post">
+<label>Name<input name="name" value="{{provider['name']}}" required></label><label>Phone<input name="phone" value="{{provider['phone']}}" required></label><label>Email<input value="{{provider['email']}}" disabled></label>
+<label>Service<select name="service">{% for i,n,d in services %}<option {% if n==provider['service'] %}selected{% endif %}>{{n}}</option>{% endfor %}</select></label>
+<label>Type of Work<input name="work_type" value="{{provider['work_type'] or ''}}"></label><label>Experience<input name="experience" value="{{provider['experience'] or ''}}"></label><label>Qualification<input name="qualification" value="{{provider['qualification'] or ''}}"></label><label>Location<input name="location" value="{{provider['location'] or ''}}"></label><label>Pricing<input name="pricing" value="{{provider['pricing'] or ''}}"></label>
+<button class="btn primary full two-button">Save Provider Details</button></form><p class="switch"><a href="{{url_for('provider_dashboard')}}">← Back to Dashboard</a></p></div></div></div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Find Providers - Seva Mithra{% endblock %}
+{% block content %}
+<section class="section search-results-page">
+  <div class="search-result-header">
+    <div>
+      <span class="eyebrow">PROVIDER SEARCH</span>
+      {% if service %}
+        <h1>Professionals for <span>{{ service }}</span></h1>
+        <p>Compare providers by experience, qualification, work type, location and pricing before choosing.</p>
+      {% else %}
+        <h1>Find a service provider</h1>
+        <p>Search for a service to see available professionals.</p>
+      {% endif %}
+    </div>
+    <form class="compact-search" method="get" action="{{ url_for('search_providers') }}">
+      <select name="service" required>
+        <option value="">Select service</option>
+        {% for i,n,d in services %}
+          <option value="{{ n }}" {% if n==service %}selected{% endif %}>{{ n }}</option>
+        {% endfor %}
+      </select>
+      <select name="location">
+        <option value="">Any location</option>
+        <option value="Hyderabad" {% if location=="Hyderabad" %}selected{% endif %}>Hyderabad</option>
+        <option value="Vijayawada" {% if location=="Vijayawada" %}selected{% endif %}>Vijayawada</option>
+        <option value="Visakhapatnam" {% if location=="Visakhapatnam" %}selected{% endif %}>Visakhapatnam</option>
+        <option value="Rajahmundry" {% if location=="Rajahmundry" %}selected{% endif %}>Rajahmundry</option>
+      </select>
+      <button class="btn primary" type="submit">Search</button>
+    </form>
+  </div>
+
+  {% if service %}
+    <div class="result-summary">
+      <b>{{ providers|length }} providers found</b>
+      <span>Compare the cards below and select the provider that best matches your needs.</span>
+    </div>
+
+    {% if providers %}
+    <div class="provider-results">
+      {% for p in providers %}
+      <article class="provider-result">
+        <div class="provider-result-top">
+          <div class="avatar large-avatar">{{ p['name'][:2].upper() }}</div>
+          <div class="provider-title">
+            <h2>{{ p['name'] }}</h2>
+            <p>{{ p['service'] }} • {{ p['work_type'] or 'General Service' }}</p>
+          </div>
+          <span class="verified">✓ Verified</span>
+        </div>
+
+        <div class="comparison-grid">
+          <div><span>⭐ Rating</span><b>{{ '4.9' if loop.index == 1 else '4.7' if loop.index == 2 else '4.8' }}/5</b></div>
+          <div><span>🛠 Experience</span><b>{{ p['experience'] or 'Not added' }}</b></div>
+          <div><span>🎓 Qualification</span><b>{{ p['qualification'] or 'Not added' }}</b></div>
+          <div><span>📍 Location</span><b>{{ p['location'] or 'Nearby' }}</b></div>
+          <div><span>💰 Pricing</span><b>{{ p['pricing'] or 'Contact provider' }}</b></div>
+          <div><span>📞 Contact</span><b>{{ p['phone'] }}</b></div>
+        </div>
+
+        <div class="provider-specialty">
+          <b>Work specialization:</b> {{ p['work_type'] or 'General service' }}
+        </div>
+
+        <div class="provider-result-actions">
+          <a class="btn outline" href="tel:{{ p['phone'] }}">📞 Contact</a>
+          {% if session.get('logged_in') and session.get('role') == 'user' %}
+          <form method="post" action="{{ url_for('book') }}">
+            <input type="hidden" name="service" value="{{ p['service'] }}">
+            <input type="hidden" name="provider_id" value="{{ p['id'] }}">
+            <input type="hidden" name="work_type" value="{{ p['work_type'] or 'General Service' }}">
+            <input type="hidden" name="address" value="">
+            <input type="hidden" name="booking_date" value="">
+            <button class="btn primary" type="submit">Select Provider & Book</button>
+          </form>
+          {% else %}
+          <a class="btn primary" href="{{ url_for('login', role='user') }}">Login to Select Provider</a>
+          {% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+      <div class="empty">No providers found for this service and location. Try another location or service.</div>
+    {% endif %}
+  {% else %}
+    <div class="empty">Select a service above to see matching professionals.</div>
+  {% endif %}
+</section>
+{% endblock %}

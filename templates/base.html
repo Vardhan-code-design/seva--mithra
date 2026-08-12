@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Seva Mithra{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="site-bg" aria-hidden="true">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+  <div class="bg-dot bg-dot-1"></div>
+  <div class="bg-dot bg-dot-2"></div>
+  <div class="bg-dot bg-dot-3"></div>
+  <div class="bg-dot bg-dot-4"></div>
+</div>
+<header class="navbar">
+  <a class="brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='seva_mithra_logo.jpeg') }}" alt="Seva Mithra logo"><span>Seva Mithra</span></a>
+  <button class="mobile-menu" onclick="toggleMenu()" aria-label="Open menu">☰</button>
+  <nav id="topNav">
+    <a href="{{ url_for('home') }}">Home</a>
+    <a href="{{ url_for('home') }}#services">Services</a>
+    <a href="{{ url_for('about') }}">About</a>
+    <a href="{{ url_for('contact') }}">Contact</a>
+    {% if session.get('logged_in') %}
+      {% if session.get('role') == 'user' %}
+        <a class="btn outline" href="{{ url_for('user_dashboard') }}">Dashboard</a>
+      {% elif session.get('role') == 'provider' %}
+        <a class="btn outline" href="{{ url_for('provider_dashboard') }}">Dashboard</a>
+      {% else %}
+        <a class="btn outline" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+      {% endif %}
+      <a class="btn primary" href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+      <a class="btn outline" href="{{ url_for('login') }}">Login</a>
+      <a class="btn primary" href="{{ url_for('register', role='user') }}">Register</a>
+    {% endif %}
+  </nav>
+</header>
+{% with messages=get_flashed_messages() %}
+  {% if messages %}
+    <div class="flash-wrap">
+      {% for message in messages %}<div class="flash">{{ message }}</div>{% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+{% block content %}{% endblock %}
+<footer>
+  <div class="brand footer-brand"><img src="{{ url_for('static', filename='seva_mithra_logo.jpeg') }}" alt="Seva Mithra logo"><span>Seva Mithra</span></div>
+  <div>Trusted local services & professionals.</div>
+  <div>© 2026 Seva Mithra</div>
+</footer>
+{% block scripts %}<script>
+function toggleMenu(){document.getElementById('topNav').classList.toggle('open')}
+setTimeout(function(){document.querySelectorAll('.flash').forEach(function(x){x.style.opacity='0';setTimeout(()=>x.remove(),500)})},3500);
+</script>{% endblock %}
+</body></html>

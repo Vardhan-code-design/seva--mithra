@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: seva-mithra
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true

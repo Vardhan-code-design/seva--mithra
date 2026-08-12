@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Login - Seva Mithra{% endblock %}
+
+{% block content %}
+<div class="auth">
+  <div class="auth-box">
+    <a class="brand auth-brand" href="{{ url_for('home') }}">
+      <span>✦</span> Seva Mithra
+    </a>
+
+    <div class="card">
+      <!-- These are real links, not JavaScript buttons.
+           They always work even if JavaScript is disabled. -->
+      <div class="tabs">
+        <a class="tab-link {% if selected_role == 'user' %}active{% endif %}"
+           href="{{ url_for('login', role='user') }}">
+          User
+        </a>
+
+        <a class="tab-link {% if selected_role == 'provider' %}active{% endif %}"
+           href="{{ url_for('login', role='provider') }}">
+          Service Provider
+        </a>
+
+        <a class="tab-link {% if selected_role == 'admin' %}active{% endif %}"
+           href="{{ url_for('login', role='admin') }}">
+          Admin
+        </a>
+      </div>
+
+      {% if selected_role == 'user' %}
+        <h1>User Login</h1>
+        <p class="sub">Login to book trusted services.</p>
+      {% elif selected_role == 'provider' %}
+        <h1>Service Provider Login</h1>
+        <p class="sub">Login to manage your assigned works and services.</p>
+      {% else %}
+        <h1>Admin Login</h1>
+        <p class="sub">Login to manage the Seva Mithra platform.</p>
+      {% endif %}
+
+      <form class="form" method="post" action="{{ url_for('login') }}">
+        <input type="hidden" name="role" value="{{ selected_role }}">
+
+        <input
+          name="email"
+          type="email"
+          placeholder="Email address"
+          autocomplete="email"
+          required
+        >
+
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button class="btn primary" type="submit">Login</button>
+      </form>
+
+      <div class="register-choice">
+        <b>Don't have an account?</b>
+        <a href="{{ url_for('register', role='user') }}">Register as User</a>
+        <a href="{{ url_for('register', role='provider') }}">Register as Service Provider</a>
+      </div>
+
+      <div class="demo">
+        <b>Demo credentials</b><br>
+        User: user@demo.com / 123456<br>
+        Provider: provider@demo.com / 123456<br>
+        Admin: admin@sevamithra.com / admin123
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // No role-switching JavaScript is required.
+  // User / Provider / Admin are normal Flask links.
+</script>
+{% endblock %}

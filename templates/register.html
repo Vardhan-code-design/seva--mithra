@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Register - Seva Mithra{% endblock %}
+{% block content %}
+<div class="auth"><div class="auth-box wide"><a class="brand auth-brand" href="{{ url_for('home') }}"><span>✦</span> Seva Mithra</a>
+<div class="card"><div class="register-head"><div><span class="eyebrow">CREATE ACCOUNT</span><h1>{{ 'User' if role=='user' else 'Service Provider' }} Registration</h1><p class="sub">Enter your details to create your Seva Mithra account.</p></div><div class="role-links"><a class="{% if role=='user' %}active{% endif %}" href="{{ url_for('register',role='user') }}">👤 User</a><a class="{% if role=='provider' %}active{% endif %}" href="{{ url_for('register',role='provider') }}">🧰 Provider</a></div></div>
+<form class="form two" method="post">
+<label>Full Name *<input name="name" required placeholder="Enter full name"></label>
+<label>Email *<input name="email" type="email" required placeholder="you@example.com"></label>
+<label>Phone Number *<input name="phone" required pattern="[0-9]{10}" placeholder="10-digit mobile number"></label>
+<label>Password *<input name="password" type="password" minlength="6" required placeholder="Minimum 6 characters"></label>
+<label>Confirm Password *<input name="confirm_password" type="password" minlength="6" required placeholder="Re-enter password"></label>
+{% if role=='user' %}
+<label>Address<input name="address" placeholder="House / street / area / city"></label>
+{% else %}
+<label>Service Category *<select name="service" id="service" required>{% for i,n,d in services %}<option>{{ n }}</option>{% endfor %}</select></label>
+<label>Type of Work<input name="work_type" id="workType" placeholder="e.g. Repair, Installation, Tuition"></label>
+<label>Work Experience<input name="experience" placeholder="e.g. 5 years"></label>
+<label>Qualification<input name="qualification" placeholder="e.g. ITI / Degree / B.Ed"></label>
+<label>Service Location<input name="location" placeholder="City / Area"></label>
+<label>Pricing<input name="pricing" placeholder="e.g. ₹299 onwards / ₹450 per hour"></label>
+{% endif %}
+<button class="btn primary full two-button">{{ 'Create User Account' if role=='user' else 'Create Provider Account' }}</button>
+</form>
+{% if role=='provider' %}<div class="info-box">For <b>Tutor</b>, you can enter subjects such as Mathematics, Science, Programming, English, School Tuition or Online Tutor in Type of Work.</div>{% endif %}
+<p class="switch">Already registered? <a href="{{ url_for('login',role=role) }}">Login here</a></p>
+</div></div></div>
+{% endblock %}

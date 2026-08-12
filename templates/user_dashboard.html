@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}User Dashboard - Seva Mithra{% endblock %}
+{% block content %}
+<div class="layout"><aside class="sidebar">
+<a class="side active" href="{{ url_for('user_dashboard') }}">🏠 Dashboard</a><a class="side" href="#booking">🔍 Services</a><a class="side" href="#bookings">📅 My Bookings</a><a class="side" href="#booking">📍 My Addresses</a><a class="side" href="#bookings">⭐ My Reviews</a><a class="side" href="{{ url_for('user_profile') }}">👤 Profile</a><a class="side" href="{{ url_for('logout') }}">🚪 Logout</a>
+</aside><main class="main">
+<div class="welcome"><div><span class="eyebrow">USER DASHBOARD</span><h1>Hello, {{ user['name'] }} 👋</h1><p>Find a trusted professional for your next task.</p></div><a class="btn primary" href="#booking">+ Book a Service</a></div>
+<div class="stats"><div class="stat">📅<b>{{ bookings|length }}</b><small>My bookings</small></div><div class="stat">✓<b>{{ bookings|selectattr('status','equalto','Completed')|list|length }}</b><small>Completed</small></div><div class="stat">⭐<b>4.8</b><small>Platform rating</small></div><div class="stat">📍<b>{{ 1 if user['address'] else 0 }}</b><small>Saved address</small></div></div>
+<section class="panel">
+<div class="panel-head"><div><h2>🔎 Search for a service</h2><p>First search your required service. Then compare all matching professionals before booking.</p></div></div>
+<form class="compact-search dashboard-search" method="get" action="{{ url_for('search_providers') }}">
+<select name="service" required><option value="">Select the service you need</option>{% for i,n,d in services %}<option value="{{ n }}">{{ n }}</option>{% endfor %}</select>
+<select name="location"><option value="">Any location</option><option>Hyderabad</option><option>Vijayawada</option><option>Visakhapatnam</option><option>Rajahmundry</option></select>
+<button class="btn primary" type="submit">Find Providers</button>
+</form>
+</section>
+<section class="panel" id="booking"><div class="panel-head"><div><h2>Book a service</h2><p>Select service, work type, address and date.</p></div></div>
+<form class="booking-form" method="post" action="{{ url_for('book') }}">
+<label>Service<select name="service" id="serviceSelect" onchange="showServiceLink()">{% for i,n,d in services %}<option>{{ n }}</option>{% endfor %}</select><a id="serviceLink" class="field-link" href="{{ url_for("service_details", service_name="Electrician") }}">View 10 services →</a></label>
+<label>Type of Work<select name="work_type" id="workTypeSelect"><option>General Service</option><option>Repair</option><option>Installation</option><option>Home Visit</option><option>Tuition</option><option>Online Class</option></select></label>
+<label>Address<input name="address" value="{{ user['address'] or '' }}" placeholder="Enter service address"></label>
+<label>Date<input name="booking_date" type="date" required></label>
+<button class="btn primary">Submit Booking</button></form></section>
+<section class="panel">
+<div class="panel-head"><div><h2>Compare before you book</h2><p>Use the service search above to see all matching providers with their specifications.</p></div>
+<a class="btn outline" href="{{ url_for('search_providers') }}">Search Providers</a></div>
+<div class="comparison-hint"><span>⭐ Ratings</span><span>🛠 Experience</span><span>🎓 Qualification</span><span>📍 Location</span><span>💰 Pricing</span><span>📞 Contact</span></div>
+</section>
+<section class="panel" id="bookings"><div class="panel-head"><h2>My Bookings</h2></div>
+{% if bookings %}{% for b in bookings %}<div class="table-row"><span>#{{ b['id'] }}</span><b>{{ b['service'] }}</b><span>{{ b['provider_name'] or 'Awaiting provider' }}</span><span class="status {% if b['status']=='Accepted' or b['status']=='Completed' %}accepted{% else %}pending{% endif %}">{{ b['status'] }}</span><span class="row-actions">{% if b['status']=='Pending' %}<form method="post" action="{{ url_for('cancel_booking',booking_id=b['id']) }}"><button class="mini danger">Cancel</button></form>{% endif %}{% if b['status']=='Completed' %}<form method="post" action="{{ url_for('review',booking_id=b['id']) }}"><select name="rating" required><option value="">Rate</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select><input name="review" placeholder="Review"><button class="mini primary">Review</button></form>{% endif %}</span></div>{% endfor %}{% else %}<div class="empty">No bookings yet. Book your first service above.</div>{% endif %}</section>
+</main></div>
+{% endblock %}
+{% block scripts %}<script>function showServiceLink(){let s=document.getElementById("serviceSelect").value;document.getElementById("serviceLink").href="/services/"+encodeURIComponent(s)}</script>{% endblock %}

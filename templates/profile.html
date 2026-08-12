@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block title %}Profile - Seva Mithra{% endblock %}{% block content %}
+<div class="auth"><div class="auth-box wide"><div class="card"><span class="eyebrow">PROFILE</span><h1>{{ 'User' if role=='user' else 'Provider' }} Profile</h1><form class="form two" method="post">
+<label>Name<input name="name" value="{{profile['name']}}" required></label><label>Phone<input name="phone" value="{{profile['phone']}}" required></label><label>Email<input value="{{profile['email']}}" disabled></label><label>Address<input name="address" value="{{profile['address'] or ''}}"></label><button class="btn primary full two-button">Save Changes</button></form><p class="switch"><a href="{{url_for('user_dashboard')}}">← Back to Dashboard</a></p></div></div></div>
+{% endblock %}

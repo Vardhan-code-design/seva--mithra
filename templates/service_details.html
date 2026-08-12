@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ service }} Services - Seva Mithra{% endblock %}
+{% block content %}
+<section class="section service-page">
+  <div class="service-hero">
+    <div>
+      <span class="eyebrow">SERVICE CATEGORY</span>
+      <h1>{{ service }}</h1>
+      <p>Choose the exact type of work you need. Seva Mithra connects you with suitable local professionals.</p>
+      <div class="service-actions">
+        <a class="btn primary" href="{{ url_for('register', role='user') }}">Register to Book</a>
+        <a class="btn outline" href="{{ url_for('login') }}">Already a member? Login</a>
+      </div>
+    </div>
+    <div class="service-count"><b>{{ subservices|length }}</b><span>services available</span></div>
+  </div>
+
+  <div class="head"><div><span class="eyebrow">AVAILABLE SERVICES</span><h2>10 {{ service }} services</h2></div></div>
+  <div class="subservice-grid">
+    {% for item in subservices %}
+    <a class="subservice" href="{{ url_for('register', role='user') }}">
+      <span class="sub-number">{{ "%02d"|format(loop.index) }}</span>
+      <div><b>{{ item }}</b><small>Book a verified professional</small></div>
+      <span class="arrow">→</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

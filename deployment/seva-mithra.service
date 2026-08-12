@@ -1,0 +1,15 @@
+[Unit]
+Description=Seva Mithra Flask Application
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/seva-mithra
+EnvironmentFile=/var/www/seva-mithra/.env
+ExecStart=/var/www/seva-mithra/.venv/bin/gunicorn -c /var/www/seva-mithra/gunicorn.conf.py wsgi:application
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
