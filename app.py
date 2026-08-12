@@ -428,7 +428,7 @@ def register(role="user"):
             return render_template(
                 "register.html",
                 role=role,
-                services=SERVICE_NAMES,
+                services=SERVICES,
                 tutor_types=TUTOR_TYPES,
             )
 
@@ -437,7 +437,7 @@ def register(role="user"):
             return render_template(
                 "register.html",
                 role=role,
-                services=SERVICE_NAMES,
+                services=SERVICES,
                 tutor_types=TUTOR_TYPES,
             )
 
@@ -499,7 +499,7 @@ def register(role="user"):
             return render_template(
                 "register.html",
                 role=role,
-                services=SERVICE_NAMES,
+                services=SERVICES,
                 tutor_types=TUTOR_TYPES,
             )
 
@@ -509,7 +509,7 @@ def register(role="user"):
     return render_template(
         "register.html",
         role=role,
-        services=SERVICE_NAMES,
+        services=SERVICES,
         tutor_types=TUTOR_TYPES,
     )
 
